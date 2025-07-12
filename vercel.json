@@ -1,38 +1,34 @@
 {
+  "functions": {
+    "app/api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "text/javascript; charset=utf-8"
+          "value": "application/javascript; charset=utf-8"
         }
       ]
     },
     {
-      "source": "/(.*)\\.js",
+      "source": "/(.*)\\.js$",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "text/javascript; charset=utf-8"
+          "value": "application/javascript; charset=utf-8"
         }
       ]
     },
     {
-      "source": "/(.*)\\.mjs",
+      "source": "/(.*)\\.mjs$",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "text/javascript; charset=utf-8"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)\\.ts",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/javascript; charset=utf-8"
+          "value": "application/javascript; charset=utf-8"
         }
       ]
     }
@@ -43,4 +39,4 @@
       "destination": "/index.html"
     }
   ]
-} 
+}
