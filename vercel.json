@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "app/[[...routes]].ts": {
-      "includeFiles": "app/**"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
