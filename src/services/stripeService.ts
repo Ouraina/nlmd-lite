@@ -21,9 +21,14 @@ export const createCheckoutSession = async (
     throw new Error('User not authenticated');
   }
 
-  // Use the real Supabase Edge Function
+  // Use the real Supabase Edge Function with correct parameter names
   const { data, error } = await supabase.functions.invoke('stripe-checkout', {
-    body: request,
+    body: {
+      price_id: request.priceId,        // Convert camelCase to snake_case
+      success_url: request.successUrl,  // Convert camelCase to snake_case
+      cancel_url: request.cancelUrl,    // Convert camelCase to snake_case
+      mode: request.mode
+    },
     headers: {
       Authorization: `Bearer ${session.access_token}`,
     },
