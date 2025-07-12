@@ -21,14 +21,25 @@ export const createCheckoutSession = async (
     throw new Error('User not authenticated');
   }
 
-  // Development mock - just redirect to success page
-  console.log('Mock payment processing for development');
-  
-  // Simulate payment processing delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
+  // Use the real Supabase Edge Function
+  const { data, error } = await supabase.functions.invoke('stripe-checkout', {
+    body: request,
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (error) {
+    console.error('Stripe checkout error:', error);
+    throw new Error(`Payment processing failed: ${error.message}`);
+  }
+
+  if (!data?.url) {
+    throw new Error('No checkout URL returned from payment processor');
+  }
+
   return {
-    sessionId: 'mock_session_' + Date.now(),
-    url: request.successUrl + '?session_id=mock_session_' + Date.now()
+    sessionId: data.sessionId || 'unknown',
+    url: data.url
   };
 };
