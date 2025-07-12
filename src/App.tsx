@@ -4,6 +4,7 @@ import { Header } from './components/layout/Header';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LoginPage } from './components/auth/LoginPage';
 import { SignupPage } from './components/auth/SignupPage';
+import { UserDashboard } from './components/UserDashboard';
 import { ScrapingDashboard } from './components/ScrapingDashboard';
 import { NotebookScrapingDashboard } from './components/NotebookScrapingDashboard';
 import { RecommendationsPanel } from './components/ai/RecommendationsPanel';
@@ -30,7 +31,7 @@ function App() {
           {/* Protected Routes */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <ScrapingDashboard />
+              <UserDashboard />
             </ProtectedRoute>
           } />
           <Route path="/notebook-discovery" element={
@@ -53,12 +54,19 @@ function App() {
               <PlatformAnalytics />
             </ProtectedRoute>
           } />
+          
+          {/* Admin Routes */}
           <Route path="/admin" element={
             <ProtectedRoute>
               <SystemHealthDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/testing" element={
+          <Route path="/admin/scraping" element={
+            <ProtectedRoute>
+              <ScrapingDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/testing" element={
             <ProtectedRoute>
               <TestRunner />
             </ProtectedRoute>
