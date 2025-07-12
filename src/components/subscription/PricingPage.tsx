@@ -18,6 +18,7 @@ export const PricingPage: React.FC = () => {
 
     setLoading(priceId);
     try {
+      console.log('Creating checkout session with:', { priceId, mode });
       const { url } = await createCheckoutSession({
         priceId,
         mode,
@@ -25,9 +26,11 @@ export const PricingPage: React.FC = () => {
         cancelUrl: `${window.location.origin}/pricing`,
       });
 
+      console.log('Checkout session created, redirecting to:', url);
       window.location.href = url;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create checkout session:', error);
+      alert(`Error: ${error.message}`); // Temporary alert to see the error
       setLoading(null);
     }
   };
