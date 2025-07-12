@@ -183,4 +183,8 @@ const HomePage: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default HomePage;
+=======
+export default HomePage;
+>>>>>>> 56538ba3cf656c39958ea1853b33d82ba75f0a95
