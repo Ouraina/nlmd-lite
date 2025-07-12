@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useSubscription } from '../../hooks/useSubscription';
-import { LogOut, User, Crown, Database, BookOpen, Sparkles, Users, BarChart3, Shield, TestTube } from 'lucide-react';
+import { LogOut, User, Crown, Database, BookOpen } from 'lucide-react';
 
 export const Header: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -103,4 +103,4 @@ export const Header: React.FC = () => {
       </div>
     </header>
   );
-};
+}; 
