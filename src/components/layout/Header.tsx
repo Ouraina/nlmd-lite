@@ -20,10 +20,10 @@ export const Header: React.FC = () => {
   const subscriptionPlan = getSubscriptionPlan();
 
   return (
-    <header className="bg-white border-b border-slate-200 px-6 py-4">
+    <header className="bg-slate-900 border-b border-slate-700 px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-slate-900">
-          NLMD Lite
+        <Link to="/" className="text-xl font-bold text-white">
+          notebooklm.directory
         </Link>
 
         {user && (
@@ -32,8 +32,8 @@ export const Header: React.FC = () => {
               to="/dashboard"
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 location.pathname === '/dashboard'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <Database className="w-4 h-4" />
@@ -43,8 +43,8 @@ export const Header: React.FC = () => {
               to="/notebook-discovery"
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 location.pathname === '/notebook-discovery'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <BookOpen className="w-4 h-4" />
@@ -57,27 +57,27 @@ export const Header: React.FC = () => {
           {user ? (
             <>
               {subscriptionPlan && isActive() && (
-                <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                <div className="flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-medium">
                   <Crown className="w-4 h-4" />
                   {subscriptionPlan.name}
                 </div>
               )}
               
-              <div className="flex items-center gap-2 text-slate-600">
+              <div className="flex items-center gap-2 text-slate-300">
                 <User className="w-4 h-4" />
                 <span className="text-sm">{user.email}</span>
               </div>
               
               <Link
                 to="/pricing"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-green-400 hover:text-green-300 text-sm font-medium"
               >
                 Pricing
               </Link>
               
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm"
+                className="flex items-center gap-2 text-slate-300 hover:text-white text-sm"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out
@@ -87,13 +87,13 @@ export const Header: React.FC = () => {
             <div className="flex items-center gap-4">
               <Link
                 to="/login"
-                className="text-slate-600 hover:text-slate-900 text-sm font-medium"
+                className="text-slate-300 hover:text-white text-sm font-medium"
               >
                 Sign In
               </Link>
               <Link
                 to="/signup"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium"
+                className="bg-green-500 text-black px-4 py-2 rounded-lg hover:bg-green-400 text-sm font-medium"
               >
                 Sign Up
               </Link>
