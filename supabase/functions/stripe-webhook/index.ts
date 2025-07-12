@@ -158,6 +158,7 @@ async function syncCustomerFromStripe(customerId: string) {
     const subscription = subscriptions.data[0];
 
     // store subscription state
+    const isFoundersForever = subscription.items.data[0].price.id === 'price_1Rk17PKsRdoxChLxhLF22XWX';
     const { error: subError } = await supabase.from('stripe_subscriptions').upsert(
       {
         customer_id: customerId,
@@ -173,6 +174,7 @@ async function syncCustomerFromStripe(customerId: string) {
             }
           : {}),
         status: subscription.status,
+        founders: isFoundersForever ? true : null,
       },
       {
         onConflict: 'customer_id',

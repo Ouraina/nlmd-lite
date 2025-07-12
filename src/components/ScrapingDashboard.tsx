@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Play, Pause, Download, AlertCircle, CheckCircle, Clock, Loader } from 'lucide-react';
+import { Plus, Play, Download, AlertCircle, CheckCircle, Clock, Loader } from 'lucide-react';
 import { ScraperService } from '../services/scraperService';
 import { ScrapingJob, BatchJob } from '../types/scraper';
 import { format } from 'date-fns';
 
 export const ScrapingDashboard: React.FC = () => {
   const [scrapingJobs, setScrapingJobs] = useState<ScrapingJob[]>([]);
-  const [batchJobs, setBatchJobs] = useState<BatchJob[]>([]);
+
   const [newUrl, setNewUrl] = useState('');
   const [batchUrls, setBatchUrls] = useState('');
   const [batchName, setBatchName] = useState('');
@@ -19,12 +19,11 @@ export const ScrapingDashboard: React.FC = () => {
 
   const loadJobs = async () => {
     try {
-      const [jobs, batches] = await Promise.all([
+      const [jobs] = await Promise.all([
         ScraperService.getScrapingJobs(),
         ScraperService.getBatchJobs()
       ]);
       setScrapingJobs(jobs);
-      setBatchJobs(batches);
     } catch (error) {
       console.error('Failed to load jobs:', error);
     }
@@ -78,7 +77,7 @@ export const ScrapingDashboard: React.FC = () => {
 
     setLoading(true);
     try {
-      const batchId = await ScraperService.createBatchJob(batchName, urls);
+      await ScraperService.createBatchJob(batchName, urls);
       
       // Process URLs one by one
       for (const url of urls) {

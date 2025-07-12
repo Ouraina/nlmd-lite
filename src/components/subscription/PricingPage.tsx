@@ -63,7 +63,8 @@ export const PricingPage: React.FC = () => {
             Choose Your Plan
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Select the perfect plan for your needs and start your journey with our platform
+            <span className="inline-block bg-green-500/10 text-green-500 px-4 py-1 rounded-full font-semibold text-sm mb-2">Founders Forever Launch Special</span><br />
+            <span className="font-bold text-green-700">Subscribe & Support — Get PRO features for life, no price increases, ever.</span>
           </p>
         </div>
 
@@ -73,15 +74,15 @@ export const PricingPage: React.FC = () => {
               key={product.id}
               className={`bg-white rounded-2xl shadow-xl border-2 p-8 relative ${
                 product.name === 'Standard Plan'
-                  ? 'border-blue-500 transform scale-105'
+                  ? 'border-green-500 transform scale-105'
                   : 'border-slate-200'
               }`}
             >
-              {product.name === 'Standard Plan' && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-1">
+              {product.foundersSpecial && (
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                  <div className="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1 animate-pulse border-2 border-green-300 shadow">
                     <Star className="w-4 h-4" />
-                    Most Popular
+                    Founders Forever
                   </div>
                 </div>
               )}
@@ -115,11 +116,11 @@ export const PricingPage: React.FC = () => {
               <button
                 onClick={() => handleSubscribe(product.priceId, product.mode)}
                 disabled={loading === product.priceId}
-                className={`w-full py-3 px-6 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ${
-                  product.name === 'Standard Plan'
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                className={`w-full py-3 px-6 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-2 shadow-lg ${
+                  product.foundersSpecial
+                    ? 'bg-green-500 text-black hover:bg-green-400 border-2 border-green-400'
                     : 'bg-slate-900 text-white hover:bg-slate-800'
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                } disabled:opacity-50 disabled:cursor-not-allowed animate-bounce`}
               >
                 {loading === product.priceId ? (
                   <>
@@ -127,7 +128,7 @@ export const PricingPage: React.FC = () => {
                     Processing...
                   </>
                 ) : (
-                  `Get ${product.name}`
+                  product.foundersSpecial ? 'Subscribe & Support — Founders Forever' : `Get ${product.name}`
                 )}
               </button>
             </div>
@@ -135,8 +136,8 @@ export const PricingPage: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-slate-600">
-            All plans include a 30-day money-back guarantee. No questions asked.
+          <p className="text-green-700 font-bold text-lg">
+            Early supporters get a Founders badge and lifetime PRO access. All plans include a 30-day money-back guarantee. No questions asked.
           </p>
         </div>
       </div>

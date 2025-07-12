@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, X, ThumbsUp, ThumbsDown, Eye, Import, Leaf, Star } from 'lucide-react';
+import { Sparkles, X, ThumbsUp, Eye, Import, Leaf, Star } from 'lucide-react';
 import { AIRecommendationService, Recommendation } from '../../services/aiRecommendationService';
 import { useAuth } from '../../hooks/useAuth';
 

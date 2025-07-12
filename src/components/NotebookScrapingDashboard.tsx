@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Play, 
-  Pause, 
   Download, 
   AlertCircle, 
   CheckCircle, 
@@ -11,7 +10,6 @@ import {
   Database,
   Globe,
   BookOpen,
-  Zap,
   Leaf,
   Star,
   Filter,

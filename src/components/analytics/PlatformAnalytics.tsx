@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, Users, BookOpen, Leaf, Download, Calendar } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, BookOpen, Leaf, Download } from 'lucide-react';
 import { AnalyticsService, PlatformMetrics } from '../../services/analyticsService';
 
 export const PlatformAnalytics: React.FC = () => {
