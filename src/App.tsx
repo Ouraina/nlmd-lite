@@ -9,7 +9,6 @@ import { NotebookScrapingDashboard } from './components/NotebookScrapingDashboar
 import { RecommendationsPanel } from './components/ai/RecommendationsPanel';
 import { TeamDashboard } from './components/collaboration/TeamDashboard';
 import { PlatformAnalytics } from './components/analytics/PlatformAnalytics';
-import { TestRunner } from './components/testing/TestRunner';
 import { SystemHealthDashboard } from './components/admin/SystemHealthDashboard';
 import { TestRunner } from './components/testing/TestRunner';
 import { PricingPage } from './components/subscription/PricingPage';
