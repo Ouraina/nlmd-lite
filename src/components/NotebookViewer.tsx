@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   ExternalLink, 
   Play, 
@@ -10,11 +10,9 @@ import {
   Heart, 
   Bookmark, 
   Share2,
-  Mail,
   X
 } from 'lucide-react';
 import { PublicNotebook } from '../services/publicNotebookDiscoveryService';
-import { useAuth } from '../hooks/useAuth';
 
 interface NotebookViewerProps {
   notebook: PublicNotebook;
@@ -23,48 +21,18 @@ interface NotebookViewerProps {
 }
 
 export const NotebookViewer: React.FC<NotebookViewerProps> = ({ notebook, isOpen, onClose }) => {
-  const [email, setEmail] = useState('');
-  const [hasEmail, setHasEmail] = useState(false);
-  const [showEmailCapture, setShowEmailCapture] = useState(false);
-  const { user } = useAuth();
-
   if (!isOpen) return null;
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setHasEmail(true);
-      setShowEmailCapture(false);
-      // Store email in localStorage for now
-      localStorage.setItem('userEmail', email);
-      console.log('📧 Captured user email:', email);
-      // After capturing email, redirect to original notebook
-      window.open(notebook.public_url, '_blank');
-    }
-  };
-
   const handleViewOriginal = () => {
-    // Log demo link warning
+    // Log demo link warning for demo content only
     if (notebook.title.includes('[DEMO]') || notebook.tags.includes('DEMO')) {
       console.warn('⚠️ This is a DEMO link. Real public NotebookLM links will be submitted by users.');
       alert('📍 DEMO CONTENT: This is a sample notebook to demonstrate our discovery engine. Real public NotebookLM links will be submitted by users and verified by our community.');
-    }
-    
-    // If user is authenticated, send them directly to Google (good faith)
-    if (user) {
-      console.log('🔓 User authenticated, redirecting directly to Google NotebookLM');
-      window.open(notebook.public_url, '_blank');
       return;
     }
     
-    // For non-authenticated users, check if they've already provided email
-    if (!hasEmail && !localStorage.getItem('userEmail')) {
-      console.log('📧 Non-authenticated user, requesting email capture');
-      setShowEmailCapture(true);
-      return;
-    }
-    
-    // User has provided email, send to notebook
+    // For all real links (including NFL Draft), go directly to NotebookLM - NO BARRIERS!
+    console.log('🚀 Opening real NotebookLM link directly:', notebook.public_url);
     window.open(notebook.public_url, '_blank');
   };
 
@@ -197,44 +165,7 @@ export const NotebookViewer: React.FC<NotebookViewerProps> = ({ notebook, isOpen
             </div>
           </div>
 
-          {/* Email Capture Modal */}
-          {showEmailCapture && (
-            <div className="mb-6 p-6 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-xl border border-green-500/30">
-              <div className="text-center mb-4">
-                <Mail className="w-12 h-12 text-green-400 mx-auto mb-3" />
-                <h3 className="text-xl font-bold text-white mb-2">Continue to Original NLM</h3>
-                <p className="text-slate-300">
-                  Quick email capture to continue to Google's NotebookLM. 
-                  <br />
-                  <span className="text-sm text-slate-400">
-                    (Signed-in users skip this step - we respect your privacy!)
-                  </span>
-                </p>
-              </div>
-              <form onSubmit={handleEmailSubmit} className="flex gap-3">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  className="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-white"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="bg-green-500 text-black px-6 py-3 rounded-lg hover:bg-green-400 font-medium transition-colors"
-                >
-                  Continue
-                </button>
-              </form>
-              <button
-                onClick={() => setShowEmailCapture(false)}
-                className="mt-3 text-slate-400 hover:text-white text-sm transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
+
         </div>
 
         {/* Footer Actions */}

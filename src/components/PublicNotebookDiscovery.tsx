@@ -128,8 +128,16 @@ export const PublicNotebookDiscovery: React.FC = () => {
   };
 
   const handleNotebookClick = (notebook: PublicNotebook) => {
-    setSelectedNotebook(notebook);
-    setShowNotebookViewer(true);
+    // For demo content, show the modal with warning
+    if (notebook.title.includes('[DEMO]') || notebook.tags.includes('DEMO')) {
+      setSelectedNotebook(notebook);
+      setShowNotebookViewer(true);
+      return;
+    }
+    
+    // For real content (like NFL Draft), go directly to NotebookLM - NO BARRIERS!
+    console.log('🚀 Opening real NotebookLM link directly:', notebook.public_url);
+    window.open(notebook.public_url, '_blank');
   };
 
   const handleCloseViewer = () => {
