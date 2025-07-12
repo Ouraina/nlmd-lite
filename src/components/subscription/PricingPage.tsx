@@ -66,9 +66,15 @@ export const PricingPage: React.FC = () => {
             Choose Your Plan
           </h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            <span className="inline-block bg-green-500/10 text-green-500 px-4 py-1 rounded-full font-semibold text-sm mb-2">Founders Forever Launch Special</span><br />
-            <span className="font-bold text-green-700">Subscribe & Support — Get PRO features for life, no price increases, ever.</span>
+            <span className="inline-block bg-green-500/10 text-green-500 px-4 py-1 rounded-full font-semibold text-sm mb-2">🚀 Early Access Launch</span><br />
+            <span className="font-bold text-green-700">Join Early Access — Be First in Line When Payments Go Live!</span>
           </p>
+          <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg max-w-xl mx-auto">
+            <p className="text-amber-800 text-sm">
+              <strong>🛠️ Payment System Coming Soon!</strong><br />
+              Click below to join our early access list and be notified the moment we launch payments. Early supporters get exclusive perks!
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -128,10 +134,10 @@ export const PricingPage: React.FC = () => {
                 {loading === product.priceId ? (
                   <>
                     <Loader className="w-4 h-4 animate-spin" />
-                    Processing...
+                    Joining Early Access...
                   </>
                 ) : (
-                  product.foundersSpecial ? 'Subscribe & Support — Founders Forever' : `Get ${product.name}`
+                  product.foundersSpecial ? '🚀 Join Early Access — Founders Forever' : `🚀 Join Early Access — ${product.name}`
                 )}
               </button>
             </div>
@@ -140,7 +146,10 @@ export const PricingPage: React.FC = () => {
 
         <div className="text-center mt-12">
           <p className="text-green-700 font-bold text-lg">
-            Early supporters get a Founders badge and lifetime PRO access. All plans include a 30-day money-back guarantee. No questions asked.
+            🎉 Early Access Perks: Founders badge, lifetime PRO access, and exclusive updates. Join the pioneers building the "Ecosystem for Human Thought"!
+          </p>
+          <p className="text-slate-600 text-sm mt-2">
+            Payment processing launches soon. Early supporters get priority access and special pricing.
           </p>
         </div>
       </div>

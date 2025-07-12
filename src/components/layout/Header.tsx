@@ -1,106 +1,123 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useSubscription } from '../../hooks/useSubscription';
-import { LogOut, User, Crown, Database, BookOpen } from 'lucide-react';
 
-export const Header: React.FC = () => {
+export default function Header() {
   const { user, signOut } = useAuth();
-  const { getSubscriptionPlan, isActive } = useSubscription(user?.id);
-  const location = useLocation();
+  const { subscription } = useSubscription();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
       await signOut();
+      navigate('/');
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('Error signing out:', error);
     }
   };
 
-  const subscriptionPlan = getSubscriptionPlan();
-
   return (
-    <header className="bg-slate-900 border-b border-slate-700 px-6 py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="text-xl font-bold text-white">
-          notebooklm.directory
-        </Link>
+    <header className="bg-gray-900 border-b border-gray-800 shadow-lg">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link 
+              to="/" 
+              className="text-2xl font-bold text-white hover:text-green-400 transition-colors"
+            >
+              NotebookLM Directory
+            </Link>
+          </div>
 
-        {user && (
-          <nav className="flex items-center gap-4">
-            <Link
-              to="/dashboard"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === '/dashboard'
-                  ? 'bg-green-500/20 text-green-400'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
-              }`}
+          {/* Navigation */}
+          <nav className="hidden md:flex space-x-8">
+            <Link 
+              to="/" 
+              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
             >
-              <Database className="w-4 h-4" />
-              Dashboard
+              Home
             </Link>
-            <Link
-              to="/notebook-discovery"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === '/notebook-discovery'
-                  ? 'bg-green-500/20 text-green-400'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
-              }`}
+            <Link 
+              to="/discover" 
+              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
             >
-              <BookOpen className="w-4 h-4" />
-              Discovery
+              Browse
             </Link>
+            <Link 
+              to="/submit" 
+              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+            >
+              Submit
+            </Link>
+            {user && (
+              <Link 
+                to="/dashboard" 
+                className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Dashboard
+              </Link>
+            )}
           </nav>
-        )}
 
-        <div className="flex items-center gap-4">
-          {user ? (
-            <>
-              {subscriptionPlan && isActive() && (
-                <div className="flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-medium">
-                  <Crown className="w-4 h-4" />
-                  {subscriptionPlan.name}
+          {/* User Menu */}
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                {/* Subscription Status */}
+                {subscription && (
+                  <span className="text-xs px-2 py-1 rounded-full bg-green-600 text-white">
+                    {subscription.status === 'active' ? 'Pro' : 'Free'}
+                  </span>
+                )}
+                
+                {/* User Avatar */}
+                <div className="flex items-center space-x-3">
+                  <span className="text-sm text-gray-300">
+                    {user.email}
+                  </span>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-gray-300 hover:text-red-400 text-sm font-medium transition-colors"
+                  >
+                    Sign Out
+                  </button>
                 </div>
-              )}
-              
-              <div className="flex items-center gap-2 text-slate-300">
-                <User className="w-4 h-4" />
-                <span className="text-sm">{user.email}</span>
+              </>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link 
+                  to="/login"
+                  className="text-gray-300 hover:text-green-400 text-sm font-medium transition-colors"
+                >
+                  Login
+                </Link>
+                <Link 
+                  to="/signup"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Sign Up
+                </Link>
               </div>
-              
-              <Link
-                to="/pricing"
-                className="text-green-400 hover:text-green-300 text-sm font-medium"
-              >
-                Pricing
-              </Link>
-              
-              <button
-                onClick={handleSignOut}
-                className="flex items-center gap-2 text-slate-300 hover:text-white text-sm"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <div className="flex items-center gap-4">
-              <Link
-                to="/login"
-                className="text-slate-300 hover:text-white text-sm font-medium"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/signup"
-                className="bg-green-500 text-black px-4 py-2 rounded-lg hover:bg-green-400 text-sm font-medium"
-              >
-                Sign Up
-              </Link>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              type="button"
+              className="text-gray-300 hover:text-green-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
+              aria-expanded="false"
+            >
+              <span className="sr-only">Open main menu</span>
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </header>
   );
-}; 
+}

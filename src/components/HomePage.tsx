@@ -97,43 +97,54 @@ const HomePage: React.FC = () => {
             🚀 July 2025 • Global Launch • Community & Research
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold mb-4">
-            The Premier <span className="text-green-400">NotebookLM</span> Directory
+            <span className="text-slate-300 text-2xl md:text-4xl">The Premier NotebookLM</span><br />
+            <span className="text-green-400 text-5xl md:text-7xl drop-shadow-[0_0_20px_rgba(34,197,94,0.6)]">Directory</span>
           </h1>
-          <p className="text-lg md:text-2xl text-slate-300 mb-8">
-            Discover. Build. Accelerate.<br />
-            Help us build a smarter ecosystem by curating and creating amazing notebooks. We are powered by collaboration, ready to track and share the massive computational footprint of AI research. <span className="text-green-400">Contribute your vision and discover what’s possible.</span>
+          <div className="text-2xl md:text-3xl font-bold text-white mb-6 animate-[pulse_3s_ease-in-out_infinite,bounce_4s_ease-in-out_infinite]">
+            Discover. Build. Accelerate.
+          </div>
+          <p className="text-lg md:text-xl text-slate-300 mb-8">
+            Help us build a smarter ecosystem by curating and creating amazing notebooks. We are powered by collaboration, ready to track and share the massive computational footprint of AI research. <span className="text-green-400">Contribute your vision and discover what's possible.</span>
           </p>
-          <div className="flex flex-col md:flex-row justify-center gap-4 mb-6">
+          
+          {/* Primary Action: Search + Get Started */}
+          <div className="flex flex-col md:flex-row justify-center gap-4 mb-8">
             <input
               type="text"
               placeholder="🔍 e.g. LLM, climate, curriculum, creative..."
               className="w-full md:w-96 px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
             />
             <button className="bg-green-400 text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-green-300 transition-colors">
-              Get Started
+              Discover
             </button>
           </div>
-          {/* Subscribe & Support CTA */}
-          <div className="flex flex-col items-center gap-2 mb-8">
+
+          {/* Listen to the Vision - Moved Higher */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold text-white mb-4">🎧 Listen to the Vision</h3>
+            <audio controls className="w-full max-w-md mx-auto mb-2 [&::-webkit-media-controls-panel]:bg-green-400 [&::-webkit-media-controls-current-time-display]:text-black [&::-webkit-media-controls-time-remaining-display]:text-black">
+              <source src="/NotebookLM_Directory_Overview.mp3" type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+            <p className="text-slate-400 text-sm text-center">Hear our vision for a shared AI research ecosystem</p>
+          </div>
+          
+          {/* Secondary Action: Subscribe - Higher Priority */}
+          <div className="mb-6">
+            <h3 className="text-xl font-bold text-white mb-4">Why Subscribe?</h3>
             <button
-              className="relative bg-green-500 text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-green-400 transition-colors shadow-lg flex items-center gap-3"
+              className="relative bg-green-500/10 border border-green-400 text-green-300 px-8 py-3 rounded-lg font-semibold hover:bg-green-400/20 transition-colors"
               onClick={() => window.location.href = '/pricing'}
             >
               <span>Subscribe & Support</span>
-              <span className="absolute -top-4 right-0 bg-green-700 text-white text-xs px-3 py-1 rounded-full font-semibold animate-pulse border-2 border-green-300 shadow">Founders Launch Special</span>
+              <span className="absolute -top-2 -right-2 bg-green-400 text-black text-xs px-2 py-1 rounded-full font-semibold">Special</span>
             </button>
-            <span className="text-green-300 text-xs font-semibold mt-2">Get PRO features for life, no price increases, ever.</span>
+            <p className="text-slate-400 text-sm mt-2">Get PRO features for life, no price increases, ever.</p>
           </div>
-          <div className="flex flex-col md:flex-row justify-center gap-4 mb-8">
-            <button className="bg-green-500/10 border border-green-400 text-green-300 px-6 py-2 rounded-lg font-semibold hover:bg-green-400/20 transition-colors">
-              Support Our Growth
-            </button>
-            <button className="bg-slate-800 border border-slate-600 text-slate-200 px-6 py-2 rounded-lg font-semibold hover:bg-slate-700 transition-colors">
-              Contribute Content
-            </button>
-          </div>
-          <div className="bg-slate-900/80 border border-slate-700 rounded-xl py-4 px-6 mb-8 inline-block">
-            <span className="text-green-400 font-bold">Est. July 2025</span> – Global Launch
+          
+          {/* Launch Date */}
+          <div className="text-slate-400 text-sm">
+            <span className="text-green-400 font-medium">Est. July 2025</span> – Global Launch
           </div>
         </div>
       </section>
@@ -154,6 +165,27 @@ const HomePage: React.FC = () => {
           <Users className="w-8 h-8 text-green-400 mb-2" />
           <h3 className="font-bold text-lg mb-2">Community Driven</h3>
           <p className="text-slate-300">Join a vibrant, open community of researchers, builders, and creators.</p>
+        </div>
+      </section>
+
+      {/* Why Subscribe Section - Moved Higher */}
+      <section className="max-w-3xl mx-auto px-4 text-center mb-16">
+        <div className="bg-green-500/10 border border-green-400 rounded-2xl p-8 shadow-lg flex flex-col items-center">
+          <h2 className="text-3xl font-bold mb-4 text-green-300">Why Subscribe?</h2>
+          <p className="text-slate-200 mb-6 text-lg">Your subscription powers open research, sustainable AI, and new features for all. Early supporters get a <span className='text-green-400 font-bold'>Founders badge</span> and <span className='text-green-400 font-bold'>lifetime PRO access</span>.</p>
+          <ul className="text-left text-slate-300 mb-6 space-y-3 text-lg">
+            <li>• <span className="text-green-300 font-semibold">Founders Forever:</span> Get PRO features for life, no price increases, ever.</li>
+            <li>• <span className="text-green-300 font-semibold">Unlimited notebook discovery</span> and advanced AI features</li>
+            <li>• <span className="text-green-300 font-semibold">Carbon impact dashboard</span> and sustainability metrics</li>
+            <li>• <span className="text-green-300 font-semibold">Priority support</span> and early access to new features</li>
+            <li>• <span className="text-green-300 font-semibold">Founders badge</span> on your profile</li>
+          </ul>
+          <button
+            className="bg-green-400 text-black px-10 py-4 rounded-lg font-bold text-xl hover:bg-green-300 transition-colors shadow-lg"
+            onClick={() => window.location.href = '/pricing'}
+          >
+            Subscribe & Support
+          </button>
         </div>
       </section>
 
@@ -202,104 +234,11 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Listen to the Vision */}
-      <section className="max-w-3xl mx-auto px-4 text-center mb-16">
-        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-8 shadow-lg flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-4">Listen to the Vision</h2>
-          <audio controls className="w-full max-w-md mb-2">
-            <source src="/NotebookLM_Directory_Overview.mp3" type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
-          <span className="text-slate-400 text-sm">Hear a glimpse of our vision for a shared AI research ecosystem.</span>
-        </div>
-      </section>
 
-      {/* Popular Notebooks */}
-      <section className="max-w-7xl mx-auto px-4 mb-16">
-        <h2 className="text-2xl font-bold mb-6 text-center">Popular <span className="text-green-400">Notebooks</span></h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {demoNotebooks.map(nb => (
-            <div key={nb.id} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 flex flex-col shadow-lg hover:border-green-400 transition-colors">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="bg-green-400/10 text-green-300 px-2 py-1 rounded-full text-xs font-bold">{nb.category}</span>
-              </div>
-              <h3 className="font-semibold text-lg mb-1">{nb.title}</h3>
-              <p className="text-slate-300 text-sm mb-3">{nb.description}</p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {nb.tags.map((tag, i) => (
-                  <span key={i} className="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs">{tag}</span>
-                ))}
-              </div>
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>{nb.views} views</span>
-                <button className="text-green-400 hover:text-green-300 font-medium">{nb.cta} →</button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-center mt-8">
-          <button className="bg-green-400 text-black px-8 py-3 rounded-lg font-bold hover:bg-green-300 transition-colors">
-            View All Notebooks
-          </button>
-        </div>
-      </section>
 
-      {/* Featured Collections */}
-      <section className="max-w-7xl mx-auto px-4 mb-16">
-        <h2 className="text-2xl font-bold mb-6 text-center">Featured <span className="text-green-400">Collections</span></h2>
-        <div className="flex justify-center gap-4 mb-8">
-          {collections.map(col => (
-            <button
-              key={col.key}
-              onClick={() => setActiveCollection(col.key)}
-              className={`px-4 py-2 rounded-full font-semibold text-sm transition-colors ${activeCollection === col.key ? 'bg-green-400 text-black' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
-            >
-              {col.name}
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {featuredProjects.map(proj => (
-            <div key={proj.id} className="bg-slate-900 border border-slate-700 rounded-2xl p-6 flex flex-col shadow-lg hover:border-green-400 transition-colors">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="bg-green-400/10 text-green-300 px-2 py-1 rounded-full text-xs font-bold">{proj.category}</span>
-              </div>
-              <h3 className="font-semibold text-lg mb-1">{proj.title}</h3>
-              <p className="text-slate-300 text-sm mb-3">{proj.description}</p>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {proj.tags.map((tag, i) => (
-                  <span key={i} className="bg-slate-800 text-slate-300 px-2 py-1 rounded text-xs">{tag}</span>
-                ))}
-              </div>
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>{proj.views} views</span>
-                <button className="text-green-400 hover:text-green-300 font-medium">{proj.cta} →</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Why Subscribe Section */}
-      <section className="max-w-3xl mx-auto px-4 text-center mb-16">
-        <div className="bg-green-500/10 border border-green-400 rounded-2xl p-8 shadow-lg flex flex-col items-center">
-          <h2 className="text-2xl font-bold mb-2 text-green-300">Why Subscribe?</h2>
-          <p className="text-slate-200 mb-4 text-lg">Your subscription powers open research, sustainable AI, and new features for all. Early supporters get a <span className='text-green-400 font-bold'>Founders badge</span> and <span className='text-green-400 font-bold'>lifetime PRO access</span>.</p>
-          <ul className="text-left text-slate-300 mb-4 space-y-2">
-            <li>• <span className="text-green-300 font-semibold">Founders Forever:</span> Get PRO features for life, no price increases, ever.</li>
-            <li>• <span className="text-green-300 font-semibold">Unlimited notebook discovery</span> and advanced AI features</li>
-            <li>• <span className="text-green-300 font-semibold">Carbon impact dashboard</span> and sustainability metrics</li>
-            <li>• <span className="text-green-300 font-semibold">Priority support</span> and early access to new features</li>
-            <li>• <span className="text-green-300 font-semibold">Founders badge</span> on your profile</li>
-          </ul>
-          <button
-            className="bg-green-400 text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-green-300 transition-colors shadow"
-            onClick={() => window.location.href = '/pricing'}
-          >
-            Subscribe & Support
-          </button>
-        </div>
-      </section>
+
+
 
       {/* Footer */}
       <footer className="bg-slate-950 text-slate-400 text-center py-6 text-sm border-t border-slate-800">

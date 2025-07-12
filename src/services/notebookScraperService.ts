@@ -473,4 +473,159 @@ export class NotebookScraperService {
       console.warn('Failed to track environmental impact:', impactError);
     }
   }
+
+  static async saveUserInteraction(userId: string, notebookId: string, interactionType: string, value?: number): Promise<void> {
+    const { error } = await supabase
+      .from('notebook_interactions')
+      .insert({
+        user_id: userId,
+        notebook_id: notebookId,
+        interaction_type: interactionType,
+        interaction_value: value || 1
+      });
+
+    if (error) {
+      console.error('Error saving user interaction:', error);
+      throw error;
+    }
+  }
+
+  static async getUserBookmarks(userId: string): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('notebook_interactions')
+      .select('notebook_id')
+      .eq('user_id', userId)
+      .eq('interaction_type', 'bookmark');
+
+    if (error) {
+      console.error('Error fetching bookmarks:', error);
+      return [];
+    }
+
+    return data?.map(item => item.notebook_id) || [];
+  }
+
+  static async toggleBookmark(userId: string, notebookId: string): Promise<boolean> {
+    // Check if bookmark exists
+    const { data: existing } = await supabase
+      .from('notebook_interactions')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('notebook_id', notebookId)
+      .eq('interaction_type', 'bookmark')
+      .single();
+
+    if (existing) {
+      // Remove bookmark
+      const { error } = await supabase
+        .from('notebook_interactions')
+        .delete()
+        .eq('id', existing.id);
+      
+      if (error) throw error;
+      return false; // Removed
+    } else {
+      // Add bookmark
+      await this.saveUserInteraction(userId, notebookId, 'bookmark');
+      return true; // Added
+    }
+  }
+
+  static async getUserPreferences(userId: string): Promise<any> {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      console.error('Error fetching user preferences:', error);
+      return null;
+    }
+
+    return data;
+  }
+
+  static async saveUserPreferences(userId: string, preferences: any): Promise<void> {
+    const { error } = await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: userId,
+        ...preferences
+      });
+
+    if (error) {
+      console.error('Error saving user preferences:', error);
+      throw error;
+    }
+  }
+
+  static async getFilteredNotebooks(filters: {
+    categories?: string[];
+    qualityRange?: [number, number];
+    computeRange?: [number, number];
+    carbonRange?: [number, number];
+    efficiencyRatings?: string[];
+    searchQuery?: string;
+  }): Promise<NotebookMetadata[]> {
+    let query = supabase
+      .from('scraped_items')
+      .select('*')
+      .order('discovered_at', { ascending: false });
+
+    // Apply filters
+    if (filters.categories && filters.categories.length > 0) {
+      query = query.in('category', filters.categories);
+    }
+
+    if (filters.qualityRange) {
+      query = query
+        .gte('quality_score', filters.qualityRange[0] / 100)
+        .lte('quality_score', filters.qualityRange[1] / 100);
+    }
+
+    if (filters.computeRange) {
+      query = query
+        .gte('estimated_compute_hours', filters.computeRange[0])
+        .lte('estimated_compute_hours', filters.computeRange[1]);
+    }
+
+    if (filters.carbonRange) {
+      query = query
+        .gte('carbon_footprint_grams', filters.carbonRange[0])
+        .lte('carbon_footprint_grams', filters.carbonRange[1]);
+    }
+
+    if (filters.efficiencyRatings && filters.efficiencyRatings.length > 0) {
+      query = query.in('energy_efficiency_rating', filters.efficiencyRatings);
+    }
+
+    if (filters.searchQuery) {
+      query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%,author.ilike.%${filters.searchQuery}%`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching filtered notebooks:', error);
+      throw error;
+    }
+
+    return data?.map(item => ({
+      title: item.title,
+      description: item.description,
+      author: item.author,
+      institution: item.institution,
+      tags: item.tags || [],
+      category: item.category,
+      sourceUrl: item.source_url,
+      sourcePlatform: item.source_platform,
+      publishedDate: item.published_date,
+      qualityScore: item.quality_score,
+      relevanceScore: item.relevance_score,
+      estimatedComputeHours: item.estimated_compute_hours,
+      carbonFootprintGrams: item.carbon_footprint_grams,
+      energyEfficiencyRating: item.energy_efficiency_rating
+    })) || [];
+  }
 }

@@ -1,9 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Header } from './components/layout/Header';
+import Header from './components/layout/Header';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LoginPage } from './components/auth/LoginPage';
 import { SignupPage } from './components/auth/SignupPage';
+import { ResetPasswordPage } from './components/auth/ResetPasswordPage';
 import { UserDashboard } from './components/UserDashboard';
 import { ScrapingDashboard } from './components/ScrapingDashboard';
 import { NotebookScrapingDashboard } from './components/NotebookScrapingDashboard';
@@ -14,6 +15,9 @@ import { SystemHealthDashboard } from './components/admin/SystemHealthDashboard'
 import { TestRunner } from './components/testing/TestRunner';
 import { PricingPage } from './components/subscription/PricingPage';
 import { SuccessPage } from './components/subscription/SuccessPage';
+import { QuickSubmissionPortal } from './components/QuickSubmissionPortal';
+import { NotebookValidationGame } from './components/NotebookValidationGame';
+import { PublicNotebookDiscovery } from './components/PublicNotebookDiscovery';
 import HomePage from './components/HomePage';
 
 function App() {
@@ -25,8 +29,12 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/success" element={<SuccessPage />} />
+          <Route path="/submit" element={<QuickSubmissionPortal />} />
+          <Route path="/validate" element={<NotebookValidationGame />} />
+          <Route path="/discover" element={<PublicNotebookDiscovery />} />
           
           {/* Protected Routes */}
           <Route path="/dashboard" element={
