@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "app/[[...routes]].ts": {
+      "includeFiles": "app/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
@@ -7,11 +12,20 @@
   ],
   "headers": [
     {
-      "source": "/assets/(.*)",
+      "source": "/assets/(.*\\.js)",
       "headers": [
         {
           "key": "Content-Type",
-          "value": "application/javascript"
+          "value": "text/javascript"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Content-Type", 
+          "value": "text/javascript"
         }
       ]
     }
