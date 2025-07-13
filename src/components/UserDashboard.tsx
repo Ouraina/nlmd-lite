@@ -1,270 +1,191 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  BookOpen, Sparkles, Users, TrendingUp, Leaf, Star, Search, Filter, 
+  BookOpen, Plus, Upload, Folder, Star, Search, Filter, 
   Eye, Heart, Share2, Grid3X3, Table, BarChart3, Clock, Award, 
   Bookmark, Download, Settings, ChevronDown, SlidersHorizontal,
-  Zap, Globe, Atom, Brain, Target, Layers, Calendar, User, ExternalLink
+  Zap, Globe, Atom, Brain, Target, Layers, Calendar, User, ExternalLink,
+  FolderPlus, Trash2, Edit3, Move, Copy
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
 import { Link, useNavigate } from 'react-router-dom';
-import { NotebookScraperService, NotebookMetadata } from '../services/notebookScraperService';
 
-interface FilterState {
-  categories: string[];
+interface PersonalNotebook {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
   tags: string[];
-  qualityRange: [number, number];
-  computeRange: [number, number];
-  carbonRange: [number, number];
-  efficiencyRatings: string[];
-  dateRange: string;
-  institutions: string[];
-  authors: string[];
+  category: string;
+  addedDate: string;
+  lastViewed?: string;
+  favorite: boolean;
+  folderId?: string;
+  author?: string;
+  institution?: string;
 }
 
-interface SortOption {
-  field: string;
-  direction: 'asc' | 'desc';
-  label: string;
+interface NotebookFolder {
+  id: string;
+  name: string;
+  color: string;
+  notebookCount: number;
+  createdDate: string;
 }
-
-type ViewMode = 'grid' | 'table' | 'detailed';
-
-const sortOptions: SortOption[] = [
-  { field: 'relevance', direction: 'desc', label: 'Most Relevant' },
-  { field: 'qualityScore', direction: 'desc', label: 'Highest Quality' },
-  { field: 'publishedDate', direction: 'desc', label: 'Most Recent' },
-  { field: 'carbonFootprintGrams', direction: 'asc', label: 'Most Sustainable' },
-  { field: 'estimatedComputeHours', direction: 'asc', label: 'Least Compute' },
-  { field: 'popularity', direction: 'desc', label: 'Most Popular' },
-  { field: 'title', direction: 'asc', label: 'Alphabetical' }
-];
-
-const categories = [
-  'Academic', 'Business', 'Creative', 'Research', 'Education', 
-  'Personal', 'Healthcare', 'Finance', 'Technology', 'Science'
-];
-
-const efficiencyRatings = ['A+', 'A', 'B', 'C', 'D'];
 
 export const UserDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { getSubscriptionPlan, isActive } = useSubscription(user?.id);
+  const { subscription, isActive } = useSubscription(user?.id);
   const navigate = useNavigate();
-  
-  // State management
-  const [searchQuery, setSearchQuery] = useState('');
-  const [notebooks, setNotebooks] = useState<NotebookMetadata[]>([]);
-  const [filteredNotebooks, setFilteredNotebooks] = useState<NotebookMetadata[]>([]);
+  const isPremium = isActive();
+
+  const [notebooks, setNotebooks] = useState<PersonalNotebook[]>([]);
+  const [folders, setFolders] = useState<NotebookFolder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<ViewMode>('table');
-  const [currentSort, setCurrentSort] = useState(sortOptions[0]);
-  const [bookmarkedNotebooks, setBookmarkedNotebooks] = useState<string[]>([]);
-  
-  // Filter state
-  const [filters, setFilters] = useState<FilterState>({
-    categories: [],
-    tags: [],
-    qualityRange: [0, 100],
-    computeRange: [0, 50],
-    carbonRange: [0, 1000],
-    efficiencyRatings: [],
-    dateRange: 'all',
-    institutions: [],
-    authors: []
-  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [draggedOver, setDraggedOver] = useState(false);
+  const [showNewFolderModal, setShowNewFolderModal] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [urlToAdd, setUrlToAdd] = useState('');
 
-  const subscriptionPlan = getSubscriptionPlan();
-  const isSubscribed = isActive();
-  const isPremium = isSubscribed || true; // For demo, always enable premium features
-
-  // Load notebooks from database
   useEffect(() => {
-    loadNotebooks();
-    if (user?.id) {
-      loadUserBookmarks();
+    if (user) {
+      loadUserNotebooks();
+      loadUserFolders();
     }
   }, [user]);
 
-  // Apply filters and sorting
-  useEffect(() => {
-    applyFiltersAndSorting();
-  }, [notebooks, searchQuery, filters, currentSort]);
-
-  const loadNotebooks = async () => {
+  const loadUserNotebooks = async () => {
     try {
-      setLoading(true);
-      
-      // Try to load from database first
-      try {
-        const realNotebooks = await NotebookScraperService.getScrapedItems();
-        if (realNotebooks.length > 0) {
-          setNotebooks(realNotebooks);
-          return;
+      // Mock data for now - replace with actual API call
+      const mockNotebooks: PersonalNotebook[] = [
+        {
+          id: '1',
+          title: 'My Research Notes',
+          description: 'Personal research compilation on AI ethics and governance',
+          url: 'https://notebooklm.google.com/notebook/abc123',
+          tags: ['AI', 'Ethics', 'Research'],
+          category: 'Research',
+          addedDate: '2024-01-15',
+          lastViewed: '2024-01-20',
+          favorite: true,
+          author: 'You',
+          institution: 'Personal'
+        },
+        {
+          id: '2',
+          title: 'Project Planning Templates',
+          description: 'Collection of project management templates and frameworks',
+          url: 'https://notebooklm.google.com/notebook/def456',
+          tags: ['Project Management', 'Templates', 'Business'],
+          category: 'Business',
+          addedDate: '2024-01-10',
+          favorite: false,
+          author: 'You',
+          institution: 'Personal'
         }
-      } catch (error) {
-        console.warn('Failed to load from database, using mock data:', error);
-      }
-      
-      // Fallback to enhanced mock data if database is empty or fails
-      const mockNotebooks = await generateMockNotebooks();
+      ];
       setNotebooks(mockNotebooks);
-      
     } catch (error) {
-      console.error('Error loading notebooks:', error);
-      // Use mock data as final fallback
-      const mockNotebooks = await generateMockNotebooks();
-      setNotebooks(mockNotebooks);
+      console.error('Error loading user notebooks:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const loadUserBookmarks = async () => {
-    if (!user?.id) return;
+  const loadUserFolders = async () => {
     try {
-      const bookmarks = await NotebookScraperService.getUserBookmarks(user.id);
-      setBookmarkedNotebooks(bookmarks);
+      // Mock data for now - replace with actual API call
+      const mockFolders: NotebookFolder[] = [
+        {
+          id: '1',
+          name: 'Research Projects',
+          color: 'blue',
+          notebookCount: 5,
+          createdDate: '2024-01-01'
+        },
+        {
+          id: '2',
+          name: 'Work Documents',
+          color: 'green',
+          notebookCount: 3,
+          createdDate: '2024-01-05'
+        }
+      ];
+      setFolders(mockFolders);
     } catch (error) {
-      console.error('Error loading bookmarks:', error);
+      console.error('Error loading user folders:', error);
     }
   };
 
-  const generateMockNotebooks = async (): Promise<NotebookMetadata[]> => {
-    // Enhanced mock data that follows the NotebookMetadata interface
-    const mockData: NotebookMetadata[] = [
-      {
-        title: 'Climate Change Prediction Models with LLMs',
-        description: 'Advanced machine learning models for predicting climate patterns using large language models and satellite data.',
-        author: 'Dr. Sarah Chen',
-        institution: 'MIT Climate Lab',
-        tags: ['Climate', 'AI', 'Machine Learning', 'Sustainability'],
-        category: 'Research',
-        sourceUrl: 'https://example.com/climate-llm',
-        sourcePlatform: 'academic',
-        publishedDate: '2024-12-15T00:00:00.000Z',
-        qualityScore: 0.94,
-        relevanceScore: 0.88,
-        estimatedComputeHours: 24.5,
-        carbonFootprintGrams: 450,
-        energyEfficiencyRating: 'A+'
-      },
-      {
-        title: 'Creative Writing Assistant for Authors',
-        description: 'AI-powered writing companion that helps authors develop characters, plot, and maintain consistent narrative voice.',
-        author: 'Alex Rivera',
-        institution: 'Stanford Creative AI Lab',
-        tags: ['Creative Writing', 'AI', 'Literature', 'NLP'],
-        category: 'Creative',
-        sourceUrl: 'https://example.com/writing-assistant',
-        sourcePlatform: 'github',
-        publishedDate: '2024-12-10T00:00:00.000Z',
-        qualityScore: 0.87,
-        relevanceScore: 0.82,
-        estimatedComputeHours: 12.3,
-        carbonFootprintGrams: 220,
-        energyEfficiencyRating: 'A'
-      }
-    ];
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDraggedOver(false);
     
-    return mockData;
+    const url = e.dataTransfer.getData('text/plain');
+    if (url && url.includes('notebooklm.google.com')) {
+      addNotebookFromUrl(url);
+    }
   };
 
-  const applyFiltersAndSorting = () => {
-    let filtered = [...notebooks];
-
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(notebook =>
-        notebook.title.toLowerCase().includes(query) ||
-        notebook.description.toLowerCase().includes(query) ||
-        notebook.author.toLowerCase().includes(query) ||
-        notebook.tags.some(tag => tag.toLowerCase().includes(query)) ||
-        (notebook.institution && notebook.institution.toLowerCase().includes(query))
-      );
-    }
-
-    // Apply category filters
-    if (filters.categories.length > 0) {
-      filtered = filtered.filter(notebook =>
-        filters.categories.includes(notebook.category)
-      );
-    }
-
-    // Apply quality range filter
-    filtered = filtered.filter(notebook =>
-      notebook.qualityScore * 100 >= filters.qualityRange[0] &&
-      notebook.qualityScore * 100 <= filters.qualityRange[1]
-    );
-
-    // Apply efficiency rating filter
-    if (filters.efficiencyRatings.length > 0) {
-      filtered = filtered.filter(notebook =>
-        filters.efficiencyRatings.includes(notebook.energyEfficiencyRating)
-      );
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      const { field, direction } = currentSort;
-      let aVal: any, bVal: any;
-
-      switch (field) {
-        case 'title':
-          aVal = a.title;
-          bVal = b.title;
-          break;
-        case 'qualityScore':
-          aVal = a.qualityScore;
-          bVal = b.qualityScore;
-          break;
-        case 'publishedDate':
-          aVal = new Date(a.publishedDate || 0).getTime();
-          bVal = new Date(b.publishedDate || 0).getTime();
-          break;
-        case 'carbonFootprintGrams':
-          aVal = a.carbonFootprintGrams;
-          bVal = b.carbonFootprintGrams;
-          break;
-        case 'estimatedComputeHours':
-          aVal = a.estimatedComputeHours;
-          bVal = b.estimatedComputeHours;
-          break;
-        default:
-          aVal = a.relevanceScore;
-          bVal = b.relevanceScore;
-      }
-
-      if (typeof aVal === 'string') {
-        return direction === 'asc' 
-          ? aVal.localeCompare(bVal)
-          : bVal.localeCompare(aVal);
-      } else {
-        return direction === 'asc' ? aVal - bVal : bVal - aVal;
-      }
-    });
-
-    setFilteredNotebooks(filtered);
-  };
-
-  const toggleBookmark = async (notebookTitle: string) => {
-    if (!user?.id) {
-      navigate('/login');
-      return;
-    }
-
+  const addNotebookFromUrl = async (url: string) => {
     try {
-      const isBookmarked = await NotebookScraperService.toggleBookmark(user.id, notebookTitle);
+      // Mock API call - replace with actual service
+      const newNotebook: PersonalNotebook = {
+        id: Date.now().toString(),
+        title: 'New Notebook',
+        description: 'Notebook added from URL',
+        url,
+        tags: [],
+        category: 'Personal',
+        addedDate: new Date().toISOString().split('T')[0],
+        favorite: false,
+        author: 'You',
+        institution: 'Personal'
+      };
       
-      if (isBookmarked) {
-        setBookmarkedNotebooks(prev => [...prev, notebookTitle]);
-      } else {
-        setBookmarkedNotebooks(prev => prev.filter(title => title !== notebookTitle));
-      }
+      setNotebooks(prev => [newNotebook, ...prev]);
+      setUrlToAdd('');
     } catch (error) {
-      console.error('Error toggling bookmark:', error);
+      console.error('Error adding notebook:', error);
     }
+  };
+
+  const toggleFavorite = (notebookId: string) => {
+    setNotebooks(prev => 
+      prev.map(notebook => 
+        notebook.id === notebookId 
+          ? { ...notebook, favorite: !notebook.favorite }
+          : notebook
+      )
+    );
+  };
+
+  const filteredNotebooks = notebooks.filter(notebook => {
+    const matchesSearch = notebook.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         notebook.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         notebook.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesFolder = selectedFolder ? notebook.folderId === selectedFolder : true;
+    
+    return matchesSearch && matchesFolder;
+  });
+
+  const createFolder = async () => {
+    if (!newFolderName.trim()) return;
+    
+    const newFolder: NotebookFolder = {
+      id: Date.now().toString(),
+      name: newFolderName,
+      color: 'blue',
+      notebookCount: 0,
+      createdDate: new Date().toISOString().split('T')[0]
+    };
+    
+    setFolders(prev => [...prev, newFolder]);
+    setNewFolderName('');
+    setShowNewFolderModal(false);
   };
 
   return (
@@ -275,11 +196,10 @@ export const UserDashboard: React.FC = () => {
           <div className="flex justify-between items-center mb-4">
             <div>
               <h1 className="text-2xl font-bold text-white">
-                Discover <span className="text-green-400">Notebooks</span>
+                My <span className="text-green-400">Notebooks</span>
               </h1>
               <p className="text-slate-300">
-                {filteredNotebooks.length} notebooks found
-                {searchQuery && ` for "${searchQuery}"`}
+                {filteredNotebooks.length} notebooks in your collection
               </p>
             </div>
             
@@ -298,98 +218,235 @@ export const UserDashboard: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="🔍 Search notebooks, authors, institutions, or topics..."
+                placeholder="🔍 Search your notebooks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-green-400 focus:border-transparent"
               />
             </div>
+            <button
+              onClick={() => setShowNewFolderModal(true)}
+              className="px-4 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl border border-slate-600 transition-colors flex items-center gap-2"
+            >
+              <FolderPlus className="w-4 h-4" />
+              New Folder
+            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto p-6">
-        {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar - Folders */}
+          <div className="lg:col-span-1">
+            <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
+              <h3 className="text-lg font-semibold mb-4">Collections</h3>
+              
+              <div className="space-y-2">
+                <button
+                  onClick={() => setSelectedFolder(null)}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                    selectedFolder === null ? 'bg-green-600 text-white' : 'hover:bg-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    All Notebooks
+                    <span className="ml-auto text-sm text-slate-400">({notebooks.length})</span>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setSelectedFolder('favorites')}
+                  className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                    selectedFolder === 'favorites' ? 'bg-green-600 text-white' : 'hover:bg-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    Favorites
+                    <span className="ml-auto text-sm text-slate-400">({notebooks.filter(n => n.favorite).length})</span>
+                  </div>
+                </button>
+                
+                {folders.map(folder => (
+                  <button
+                    key={folder.id}
+                    onClick={() => setSelectedFolder(folder.id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                      selectedFolder === folder.id ? 'bg-green-600 text-white' : 'hover:bg-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Folder className="w-4 h-4" />
+                      {folder.name}
+                      <span className="ml-auto text-sm text-slate-400">({folder.notebookCount})</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        ) : (
-          <>
-            {/* Notebooks Display */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredNotebooks.map((notebook, index) => (
-                <div key={index} className="bg-slate-800 rounded-xl border border-slate-700 p-6 hover:shadow-lg transition-all group">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="px-2 py-1 rounded-lg text-xs font-medium border bg-green-100 text-green-800 border-green-200">
-                      {notebook.category}
-                    </div>
-                    {isPremium && (
-                      <button
-                        onClick={() => toggleBookmark(notebook.title)}
-                        className={`p-1 rounded transition-colors ${
-                          bookmarkedNotebooks.includes(notebook.title) ? 'text-red-500 hover:text-red-600' : 'text-slate-400 hover:text-slate-600'
-                        }`}
-                      >
-                        <Heart className={`w-4 h-4 ${bookmarkedNotebooks.includes(notebook.title) ? 'fill-current' : ''}`} />
-                      </button>
-                    )}
-                  </div>
 
-                  <h3 className="font-semibold text-white mb-2 group-hover:text-green-400 transition-colors">
-                    {notebook.title}
-                  </h3>
-                  
-                  <p className="text-sm text-slate-300 mb-4 line-clamp-3">
-                    {notebook.description}
-                  </p>
-
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-1 text-xs text-slate-400">
-                      <User className="w-3 h-3" />
-                      {notebook.author}
-                    </div>
-                    {notebook.institution && (
-                      <>
-                        <span className="text-slate-600">•</span>
-                        <div className="text-xs text-slate-400">{notebook.institution}</div>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {notebook.tags.slice(0, 3).map((tag, i) => (
-                      <span
-                        key={i}
-                        className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {notebook.tags.length > 3 && (
-                      <span className="text-xs text-slate-400">+{notebook.tags.length - 3}</span>
-                    )}
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-slate-700">
-                    <button className="w-full bg-green-400 text-black py-2 px-4 rounded-lg hover:bg-green-300 transition-colors text-sm font-medium">
-                      View Notebook
-                    </button>
-                  </div>
+          {/* Main Content Area */}
+          <div className="lg:col-span-3">
+            {/* Upload Drop Zone */}
+            <div
+              className={`border-2 border-dashed rounded-xl p-6 mb-6 transition-colors ${
+                draggedOver ? 'border-green-400 bg-green-400/5' : 'border-slate-600 hover:border-slate-500'
+              }`}
+              onDrop={handleDrop}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDraggedOver(true);
+              }}
+              onDragLeave={() => setDraggedOver(false)}
+            >
+              <div className="text-center">
+                <Upload className="w-8 h-8 text-slate-400 mx-auto mb-3" />
+                <h3 className="text-lg font-medium text-white mb-2">Add Notebook</h3>
+                <p className="text-slate-400 mb-4">
+                  Drag and drop a NotebookLM URL here, or paste it below
+                </p>
+                
+                <div className="flex gap-3 max-w-md mx-auto">
+                  <input
+                    type="url"
+                    placeholder="https://notebooklm.google.com/notebook/..."
+                    value={urlToAdd}
+                    onChange={(e) => setUrlToAdd(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                  />
+                  <button
+                    onClick={() => addNotebookFromUrl(urlToAdd)}
+                    disabled={!urlToAdd.trim()}
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 disabled:text-slate-400 rounded-lg transition-colors"
+                  >
+                    Add
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
 
-            {filteredNotebooks.length === 0 && (
-              <div className="text-center py-12">
-                <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-white mb-2">No notebooks found</h3>
-                <p className="text-slate-400">Try adjusting your search or filters</p>
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
               </div>
+            ) : (
+              <>
+                {/* Notebooks Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {filteredNotebooks.map((notebook) => (
+                    <div key={notebook.id} className="bg-slate-800 rounded-xl border border-slate-700 p-6 hover:shadow-lg transition-all group">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="px-2 py-1 rounded-lg text-xs font-medium border bg-green-100 text-green-800 border-green-200">
+                          {notebook.category}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleFavorite(notebook.id)}
+                            className={`p-1 rounded transition-colors ${
+                              notebook.favorite ? 'text-yellow-400 hover:text-yellow-500' : 'text-slate-400 hover:text-slate-300'
+                            }`}
+                          >
+                            <Star className={`w-4 h-4 ${notebook.favorite ? 'fill-current' : ''}`} />
+                          </button>
+                          <button className="p-1 rounded text-slate-400 hover:text-slate-300 transition-colors">
+                            <Settings className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <h3 className="font-semibold text-white mb-2 group-hover:text-green-400 transition-colors">
+                        {notebook.title}
+                      </h3>
+                      
+                      <p className="text-sm text-slate-300 mb-4 line-clamp-3">
+                        {notebook.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        {notebook.tags.slice(0, 3).map((tag, i) => (
+                          <span
+                            key={i}
+                            className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {notebook.tags.length > 3 && (
+                          <span className="text-xs text-slate-400">+{notebook.tags.length - 3}</span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-slate-400 mb-4">
+                        <span>Added {notebook.addedDate}</span>
+                        {notebook.lastViewed && (
+                          <span>Last viewed {notebook.lastViewed}</span>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors text-sm font-medium">
+                          Open Notebook
+                        </button>
+                        <button className="p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition-colors">
+                          <Share2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {filteredNotebooks.length === 0 && (
+                  <div className="text-center py-12">
+                    <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-white mb-2">No notebooks found</h3>
+                    <p className="text-slate-400">
+                      {searchQuery ? 'Try adjusting your search' : 'Add your first notebook using the drop zone above'}
+                    </p>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </div>
       </div>
+
+      {/* New Folder Modal */}
+      {showNewFolderModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Create New Folder</h3>
+            
+            <input
+              type="text"
+              placeholder="Folder name"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-green-400 focus:border-transparent mb-4"
+              autoFocus
+            />
+            
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowNewFolderModal(false)}
+                className="px-4 py-2 text-slate-400 hover:text-slate-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createFolder}
+                disabled={!newFolderName.trim()}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 disabled:text-slate-400 rounded-lg transition-colors"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }; 
