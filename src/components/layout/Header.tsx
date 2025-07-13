@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useSubscription } from '../../hooks/useSubscription';
 
@@ -7,6 +7,7 @@ export default function Header() {
   const { user, signOut } = useAuth();
   const { subscription } = useSubscription(user?.id);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSignOut = async () => {
     try {
@@ -36,32 +37,52 @@ export default function Header() {
           <nav className="hidden md:flex space-x-8">
             <Link 
               to="/" 
-              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                location.pathname === '/' 
+                  ? 'text-green-400 border-b-2 border-green-400' 
+                  : 'text-gray-300 hover:text-green-400'
+              }`}
             >
               Home
             </Link>
             <Link 
               to="/discover" 
-              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                location.pathname === '/discover' 
+                  ? 'text-green-400 border-b-2 border-green-400' 
+                  : 'text-gray-300 hover:text-green-400'
+              }`}
             >
               Browse
             </Link>
             <Link 
               to="/submit" 
-              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                location.pathname === '/submit' 
+                  ? 'text-green-400 border-b-2 border-green-400' 
+                  : 'text-gray-300 hover:text-green-400'
+              }`}
             >
               Submit
             </Link>
             <Link 
               to="/pricing" 
-              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+              className={`px-3 py-2 text-sm font-medium transition-colors ${
+                location.pathname === '/pricing' 
+                  ? 'text-green-400 border-b-2 border-green-400' 
+                  : 'text-gray-300 hover:text-green-400'
+              }`}
             >
               Pricing
             </Link>
             {user && (
               <Link 
                 to="/dashboard" 
-                className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  location.pathname === '/dashboard' 
+                    ? 'text-green-400 border-b-2 border-green-400' 
+                    : 'text-gray-300 hover:text-green-400'
+                }`}
               >
                 Dashboard
               </Link>
