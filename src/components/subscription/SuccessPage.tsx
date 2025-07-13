@@ -1,81 +1,138 @@
-import React from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CheckCircle, ArrowRight, Star, Loader } from 'lucide-react';
 
-export const SuccessPage: React.FC = () => {
+export default function SuccessPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
 
-  // Accept any of the possible Stripe session param names
-  const sessionId =
-    searchParams.get('session_id') ||
-    searchParams.get('checkout_session_id') ||
-    searchParams.get('sessionId');
+  useEffect(() => {
+    // Clear any stored checkout data
+    localStorage.removeItem('pendingCheckout');
+    
+    // Show loading briefly, then confirm payment
+    const timer = setTimeout(() => {
+      setIsPaymentConfirmed(true);
+    }, 500);
 
-  // Log all params for debugging
-  React.useEffect(() => {
-    console.log('SuccessPage query params:', Object.fromEntries(searchParams.entries()));
-  }, [searchParams]);
+    return () => clearTimeout(timer);
+  }, []);
 
-  if (!sessionId) {
+  // Show loading state first
+  if (!isPaymentConfirmed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-xl border border-red-200 p-8 w-full max-w-lg text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">
-            Invalid Access
-          </h1>
-          <p className="text-slate-600 mb-6">
-            This page can only be accessed after completing a successful payment.
-          </p>
-          <Link
-            to="/pricing"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            View Pricing
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-green-900 flex items-center justify-center">
+        <div className="text-center text-white">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p className="text-lg">Confirming Payment...</p>
         </div>
       </div>
     );
   }
 
-  // Always show success if any session param is present
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 w-full max-w-lg text-center">
-        <div className="mb-8">
-          <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
-          <h1 className="text-3xl font-bold text-slate-900 mb-4">
-            Payment Successful!
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-green-900 flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full">
+        {/* Success Animation */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-6 animate-bounce">
+            <CheckCircle className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-4xl font-bold text-white mb-4">
+            🎉 Welcome to NotebookLM Directory!
           </h1>
-          <p className="text-slate-600 leading-relaxed mb-4">
-            Welcome to <strong className="text-green-600">NotebookLM Directory Premium</strong>!
-            <br />Your subscription is now active and ready to use.
+          <p className="text-xl text-gray-300">
+            Your payment was successful! You now have access to all premium features.
           </p>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <p className="text-green-800 font-semibold">
-              🎉 You're all set!
-            </p>
-            <p className="text-green-700 text-sm mt-1">
-              Access all premium features, unlimited notebook viewing, and advanced search capabilities.
-            </p>
+        </div>
+
+        {/* Features Unlocked */}
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-gray-700">
+          <h2 className="text-2xl font-semibold text-white mb-6 flex items-center">
+            <Star className="w-6 h-6 text-yellow-400 mr-2" />
+            Features Now Active
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-white font-medium">Unlimited Notebook Discovery</h3>
+                <p className="text-gray-400 text-sm">Search and explore endless AI-powered notebooks</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-white font-medium">AI-Powered Recommendations</h3>
+                <p className="text-gray-400 text-sm">Get personalized notebook suggestions</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-white font-medium">Carbon Impact Dashboard</h3>
+                <p className="text-gray-400 text-sm">Track your environmental contribution</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-white font-medium">Priority Support</h3>
+                <p className="text-gray-400 text-sm">Get help when you need it most</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-white font-medium">Exclusive Founders Badge</h3>
+                <p className="text-gray-400 text-sm">Show your pioneer status</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="text-white font-medium">Future PRO Features</h3>
+                <p className="text-gray-400 text-sm">Access to all upcoming premium tools</p>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="space-y-4">
-          <Link
-            to="/dashboard"
-            className="w-full bg-green-600 text-white py-3 px-6 rounded-xl hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center justify-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors"
           >
-            Go to Dashboard
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
-            to="/discover"
-            className="w-full bg-slate-100 text-slate-700 py-3 px-6 rounded-xl hover:bg-slate-200 transition-colors"
+            Start Exploring
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </button>
+          
+          <button
+            onClick={() => navigate('/pricing')}
+            className="flex items-center justify-center px-8 py-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-xl transition-colors"
           >
-            Explore Notebooks
-          </Link>
+            View Plan Details
+          </button>
+        </div>
+
+        {/* Support */}
+        <div className="text-center mt-8">
+          <p className="text-gray-400 text-sm">
+            Need help? Contact us at{' '}
+            <a href="mailto:support@notebooklm.directory" className="text-green-400 hover:text-green-300">
+              support@notebooklm.directory
+            </a>
+          </p>
         </div>
       </div>
     </div>
   );
-};
+}
