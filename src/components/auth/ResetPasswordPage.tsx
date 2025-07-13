@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../config/supabase';
 import { Loader, Lock, AlertCircle, CheckCircle } from 'lucide-react';
 
@@ -9,25 +9,50 @@ export const ResetPasswordPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [searchParams] = useSearchParams();
+  const [tokenLoading, setTokenLoading] = useState(true);
+  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if we have the required access token
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    // Parse hash parameters (Supabase sends tokens in URL hash, not query params)
+    const parseHashParams = (hash: string) => {
+      const params = new URLSearchParams(hash.substring(1)); // Remove # and parse
+      return {
+        access_token: params.get('access_token'),
+        refresh_token: params.get('refresh_token'),
+        type: params.get('type'),
+        error: params.get('error'),
+        error_description: params.get('error_description')
+      };
+    };
+
+    const hashParams = parseHashParams(location.hash);
     
-    if (!accessToken || !refreshToken) {
+    console.log('Hash params:', hashParams); // Debug log
+    
+    if (hashParams.error) {
+      setError(hashParams.error_description || hashParams.error);
+      setTokenLoading(false);
+      return;
+    }
+
+    if (!hashParams.access_token || !hashParams.refresh_token) {
       setError('Invalid reset link. Please request a new password reset.');
+      setTokenLoading(false);
       return;
     }
 
     // Set the session with the tokens
     supabase.auth.setSession({
-      access_token: accessToken,
-      refresh_token: refreshToken,
+      access_token: hashParams.access_token,
+      refresh_token: hashParams.refresh_token,
+    }).then(({ error }) => {
+      if (error) {
+        setError(error.message);
+      }
+      setTokenLoading(false);
     });
-  }, [searchParams]);
+  }, [location.hash]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +79,7 @@ export const ResetPasswordPage: React.FC = () => {
       } else {
         setSuccess(true);
         setTimeout(() => {
-          navigate('/login');
+          navigate('/dashboard'); // Redirect to dashboard instead of login
         }, 3000);
       }
     } catch (err) {
@@ -64,6 +89,21 @@ export const ResetPasswordPage: React.FC = () => {
     }
   };
 
+  // Loading state while processing tokens
+  if (tokenLoading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
+        <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-8 w-full max-w-md text-center">
+          <Loader className="w-8 h-8 animate-spin text-green-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-white mb-2">Verifying Reset Link</h1>
+          <p className="text-gray-400">
+            Please wait while we verify your password reset link...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (success) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
@@ -71,7 +111,7 @@ export const ResetPasswordPage: React.FC = () => {
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-white mb-2">Password Reset Successful</h1>
           <p className="text-gray-400 mb-6">
-            Your password has been successfully updated. You will be redirected to the login page in a few seconds.
+            Your password has been successfully updated. You will be redirected to your dashboard in a few seconds.
           </p>
           <div className="flex justify-center">
             <Loader className="w-6 h-6 animate-spin text-green-400" />
@@ -148,6 +188,15 @@ export const ResetPasswordPage: React.FC = () => {
             )}
           </button>
         </form>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => navigate('/login')}
+            className="text-green-400 hover:text-green-300 text-sm font-medium"
+          >
+            Back to Login
+          </button>
+        </div>
       </div>
     </div>
   );
