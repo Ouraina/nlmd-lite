@@ -24,7 +24,7 @@ export const useSubscription = (userId: string | undefined) => {
     const fetchSubscription = async () => {
       try {
         const { data, error } = await supabase
-          .from('stripe_user_subscriptions')
+          .from('stripe_subscriptions')
           .select('*')
           .maybeSingle();
 
