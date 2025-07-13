@@ -47,33 +47,33 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 w-full max-w-md">
+    <div className="min-h-screen bg-brandGray flex items-center justify-center p-6">
+      <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-8 w-full max-w-md">
         <div className="text-center mb-8">
           {resetMode ? (
             <>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Reset Password</h1>
-              <p className="text-slate-600">Enter your email to receive a reset link</p>
+              <h1 className="text-3xl font-bold text-white">Reset Password</h1>
+              <p className="text-brandSlate">Enter your email to receive a reset link</p>
             </>
           ) : (
             <>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h1>
-              <p className="text-slate-600">Sign in to your account to continue</p>
+              <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
+              <p className="text-brandSlate">Sign in to your account to continue</p>
             </>
           )}
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-            <p className="text-red-700 text-sm">{error}</p>
+          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-lg flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <p className="text-red-300 text-sm">{error}</p>
           </div>
         )}
 
         {resetSent && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-            <Mail className="w-5 h-5 text-green-500 flex-shrink-0" />
-            <p className="text-green-700 text-sm">
+          <div className="mb-6 p-4 bg-green-900/20 border border-green-500/50 rounded-lg flex items-center gap-3">
+            <Mail className="w-5 h-5 text-green-400 flex-shrink-0" />
+            <p className="text-green-300 text-sm">
               Password reset email sent! Check your inbox and follow the link to reset your password.
             </p>
           </div>
@@ -88,7 +88,7 @@ export const LoginPage: React.FC = () => {
                 setResetSent(false);
                 setError(null);
               }}
-              className="mb-4 flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+              className="mb-4 flex items-center gap-2 text-brandSlate hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Login
@@ -96,18 +96,18 @@ export const LoginPage: React.FC = () => {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brandSlate" />
               <input
                 type="email"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 text-white rounded-xl focus:ring-2 focus:ring-brandGreen focus:border-transparent transition-colors placeholder-gray-400"
                 placeholder="Enter your email"
               />
             </div>
@@ -115,18 +115,18 @@ export const LoginPage: React.FC = () => {
 
           {!resetMode && (
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brandSlate" />
                 <input
                   type="password"
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 text-white rounded-xl focus:ring-2 focus:ring-brandGreen focus:border-transparent transition-colors placeholder-gray-400"
                   placeholder="Enter your password"
                 />
               </div>
@@ -136,7 +136,7 @@ export const LoginPage: React.FC = () => {
           <button
             type="submit"
             disabled={loading || resetSent}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-brandGreen text-black py-3 px-4 rounded-xl hover:bg-brandGreenDark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
           >
             {loading ? (
               <>
@@ -156,7 +156,7 @@ export const LoginPage: React.FC = () => {
                   setResetMode(true);
                   setError(null);
                 }}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+                className="text-brandGreen hover:text-brandGreenDark text-sm font-medium transition-colors"
               >
                 Forgot your password?
               </button>
@@ -165,9 +165,9 @@ export const LoginPage: React.FC = () => {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-slate-600">
+          <p className="text-brandSlate">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link to="/signup" className="text-brandGreen hover:text-brandGreenDark font-medium">
               Sign up
             </Link>
           </p>

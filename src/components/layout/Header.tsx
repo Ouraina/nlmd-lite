@@ -27,7 +27,8 @@ export default function Header() {
               to="/" 
               className="text-2xl font-bold text-white hover:text-green-400 transition-colors"
             >
-              NotebookLM Directory
+              <span className="text-brandWhite">notebooklm.</span>
+              <span className="text-brandGreen">directory</span>
             </Link>
           </div>
 
@@ -68,7 +69,7 @@ export default function Header() {
                 {/* Subscription Status */}
                 {subscription && (
                   <span className="text-xs px-2 py-1 rounded-full bg-green-600 text-white">
-                    {subscription.status === 'active' ? 'Pro' : 'Free'}
+                    Pro
                   </span>
                 )}
                 

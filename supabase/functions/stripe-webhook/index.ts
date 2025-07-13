@@ -1,9 +1,19 @@
+// @ts-ignore: Ignore type errors for edge runtime
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+// @ts-ignore: Ignore type errors for Stripe import in Deno
 import Stripe from 'npm:stripe@17.7.0';
+// @ts-ignore: Ignore type errors for Supabase import in Deno
 import { createClient } from 'npm:@supabase/supabase-js@2.49.1';
 
-const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY')!;
-const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!;
+const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY');
+const stripeWebhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
+
+if (!stripeSecret) {
+  throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+}
+if (!stripeWebhookSecret) {
+  throw new Error('STRIPE_WEBHOOK_SECRET environment variable is not set');
+}
 const stripe = new Stripe(stripeSecret, {
   appInfo: {
     name: 'Bolt Integration',
