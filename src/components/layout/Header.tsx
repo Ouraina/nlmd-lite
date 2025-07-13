@@ -53,7 +53,7 @@ export default function Header() {
                   : 'text-gray-300 hover:text-green-400'
               }`}
             >
-              Browse
+              Discover
             </Link>
             <Link 
               to="/submit" 
