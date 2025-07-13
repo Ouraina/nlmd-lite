@@ -11,7 +11,7 @@ export interface StripeProduct {
 export const STRIPE_PRODUCTS: StripeProduct[] = [
   {
     id: 'prod_S1fpVKDzS8f2d0',
-    priceId: 'price_1Rk17PKsRdoxChUxhLF222WX',
+    priceId: 'price_1RkWa9KsRdoxChUxLLqwox9u',
     name: "Founder's Special",
     description: 'Founders Launch Special: Get PRO features for life at this rate – no price increases, ever! Unlimited notebook discovery & search, AI-powered recommendations, Carbon impact dashboard, Priority support & early access, Exclusive Founders badge, All future PRO features included, Rate locked forever – support the vision! Join the pioneers building the "Ecosystem for Human Thought".',
     mode: 'subscription',
