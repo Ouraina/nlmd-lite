@@ -167,7 +167,8 @@ export const UserDashboard: React.FC = () => {
                          notebook.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          notebook.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    const matchesFolder = selectedFolder ? notebook.folderId === selectedFolder : true;
+    const matchesFolder = selectedFolder === 'favorites' ? notebook.favorite : 
+                         selectedFolder ? notebook.folderId === selectedFolder : true;
     
     return matchesSearch && matchesFolder;
   });

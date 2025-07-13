@@ -5,7 +5,7 @@ import { useSubscription } from '../../hooks/useSubscription';
 
 export default function Header() {
   const { user, signOut } = useAuth();
-  const { subscription } = useSubscription();
+  const { subscription } = useSubscription(user?.id);
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -51,6 +51,12 @@ export default function Header() {
               className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
             >
               Submit
+            </Link>
+            <Link 
+              to="/pricing" 
+              className="text-gray-300 hover:text-green-400 px-3 py-2 text-sm font-medium transition-colors"
+            >
+              Pricing
             </Link>
             {user && (
               <Link 
