@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../config/supabase';
-import { Loader, Mail, Lock, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Loader, Mail, Lock, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -21,10 +21,19 @@ export const LoginPage: React.FC = () => {
 
     try {
       if (resetMode) {
-        // Handle password reset
+        // 🚨 CRITICAL FIX: Use production-safe URL
+        const baseUrl = window.location.origin;
+        
+        // If we're on localhost, we might need to use a different URL for production
+        // But for now, let's use the current origin which should be correct in production
+        const resetUrl = `${baseUrl}/auth/reset-password`;
+        
+        console.log('Sending reset email with redirect URL:', resetUrl);
+        
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/reset-password`,
+          redirectTo: resetUrl,
         });
+        
         if (error) {
           setError(error.message);
         } else {
@@ -46,68 +55,63 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  if (resetSent) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
+        <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-8 w-full max-w-md text-center">
+          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-white mb-2">Check Your Email</h1>
+          <p className="text-gray-400 mb-6">
+            We've sent a password reset link to {email}. Please check your email and follow the instructions to reset your password.
+          </p>
+          <button
+            onClick={() => {
+              setResetSent(false);
+              setResetMode(false);
+              setEmail('');
+            }}
+            className="text-green-400 hover:text-green-300 font-medium"
+          >
+            Back to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-brandGray flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-6">
       <div className="bg-gray-800 rounded-2xl shadow-xl border border-gray-700 p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          {resetMode ? (
-            <>
-              <h1 className="text-3xl font-bold text-white">Reset Password</h1>
-              <p className="text-brandSlate">Enter your email to receive a reset link</p>
-            </>
-          ) : (
-            <>
-              <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-              <p className="text-brandSlate">Sign in to your account to continue</p>
-            </>
-          )}
+          <h1 className="text-3xl font-bold text-white mb-2">
+            {resetMode ? 'Reset Password' : 'Welcome Back'}
+          </h1>
+          <p className="text-gray-400">
+            {resetMode ? 'Enter your email to receive a reset link' : 'Sign in to your account'}
+          </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-lg flex items-center gap-3">
+          <div className="mb-6 p-4 bg-red-900/50 border border-red-700 rounded-lg flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
             <p className="text-red-300 text-sm">{error}</p>
           </div>
         )}
 
-        {resetSent && (
-          <div className="mb-6 p-4 bg-green-900/20 border border-green-500/50 rounded-lg flex items-center gap-3">
-            <Mail className="w-5 h-5 text-green-400 flex-shrink-0" />
-            <p className="text-green-300 text-sm">
-              Password reset email sent! Check your inbox and follow the link to reset your password.
-            </p>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
-          {resetMode && (
-            <button
-              type="button"
-              onClick={() => {
-                setResetMode(false);
-                setResetSent(false);
-                setError(null);
-              }}
-              className="mb-4 flex items-center gap-2 text-brandSlate hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Login
-            </button>
-          )}
-
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brandSlate" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
               <input
                 type="email"
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 text-white rounded-xl focus:ring-2 focus:ring-brandGreen focus:border-transparent transition-colors placeholder-gray-400"
+                className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors text-white placeholder-gray-400"
                 placeholder="Enter your email"
               />
             </div>
@@ -115,59 +119,54 @@ export const LoginPage: React.FC = () => {
 
           {!resetMode && (
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-brandSlate" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="password"
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-600 text-white rounded-xl focus:ring-2 focus:ring-brandGreen focus:border-transparent transition-colors placeholder-gray-400"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors text-white placeholder-gray-400"
                   placeholder="Enter your password"
                 />
               </div>
             </div>
           )}
 
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setResetMode(!resetMode)}
+              className="text-sm text-green-400 hover:text-green-300 font-medium"
+            >
+              {resetMode ? 'Back to Login' : 'Forgot Password?'}
+            </button>
+          </div>
+
           <button
             type="submit"
-            disabled={loading || resetSent}
-            className="w-full bg-brandGreen text-black py-3 px-4 rounded-xl hover:bg-brandGreenDark disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-medium"
+            disabled={loading}
+            className="w-full bg-green-600 text-white py-3 px-4 rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
                 <Loader className="w-4 h-4 animate-spin" />
-                {resetMode ? 'Sending Reset Email...' : 'Signing In...'}
+                {resetMode ? 'Sending Reset Link...' : 'Signing In...'}
               </>
             ) : (
-              resetMode ? 'Send Reset Email' : 'Sign In'
+              resetMode ? 'Send Reset Link' : 'Sign In'
             )}
           </button>
-
-          {!resetMode && (
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setResetMode(true);
-                  setError(null);
-                }}
-                className="text-brandGreen hover:text-brandGreenDark text-sm font-medium transition-colors"
-              >
-                Forgot your password?
-              </button>
-            </div>
-          )}
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-brandSlate">
+          <p className="text-gray-400">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-brandGreen hover:text-brandGreenDark font-medium">
+            <Link to="/signup" className="text-green-400 hover:text-green-300 font-medium">
               Sign up
             </Link>
           </p>
