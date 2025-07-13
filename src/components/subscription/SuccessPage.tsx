@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, ArrowRight, Star, Loader } from 'lucide-react';
 
-export default function SuccessPage() {
+export function SuccessPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
