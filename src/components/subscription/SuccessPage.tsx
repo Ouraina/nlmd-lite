@@ -15,6 +15,29 @@ export const SuccessPage: React.FC = () => {
     localStorage.removeItem('checkout-session-id');
   }, []);
 
+  // Security check: Block access without valid Stripe session
+  if (!sessionId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-red-200 p-8 w-full max-w-lg text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">
+            Invalid Access
+          </h1>
+          <p className="text-slate-600 mb-6">
+            This page can only be accessed after completing a successful payment.
+          </p>
+          <Link
+            to="/pricing"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            View Pricing
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 w-full max-w-lg text-center">

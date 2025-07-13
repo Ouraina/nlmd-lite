@@ -21,19 +21,6 @@ export const createCheckoutSession = async (
     throw new Error('User not authenticated');
   }
 
-  // 🚀 TEMPORARILY BYPASSING PAYMENT PROCESSING FOR LAUNCH
-  // TODO: Re-enable once Edge Function is fixed
-  
-  // Simulate a successful checkout session creation
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Add loading effect
-  
-  // Return a mock successful response that redirects to success page
-  return {
-    sessionId: 'temp_session_' + Date.now(),
-    url: request.successUrl + '?temp_signup=true&plan=' + encodeURIComponent(request.priceId)
-  };
-
-  /* ORIGINAL PAYMENT CODE - WILL RE-ENABLE AFTER LAUNCH
   // Use the real Supabase Edge Function with correct parameter names
   const { data, error } = await supabase.functions.invoke('stripe-checkout', {
     body: {
@@ -60,5 +47,4 @@ export const createCheckoutSession = async (
     sessionId: data.sessionId || 'unknown',
     url: data.url
   };
-  */
 };
