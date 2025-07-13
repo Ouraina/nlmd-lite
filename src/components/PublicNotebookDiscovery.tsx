@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { 
   Search, 
   Filter, 
@@ -25,6 +26,7 @@ import { PublicNotebookDiscoveryService, PublicNotebook } from '../services/publ
 import { NotebookViewer } from './NotebookViewer';
 
 export const PublicNotebookDiscovery: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [notebooks, setNotebooks] = useState<PublicNotebook[]>([]);
   const [featuredNotebooks, setFeaturedNotebooks] = useState<PublicNotebook[]>([]);
@@ -53,6 +55,23 @@ export const PublicNotebookDiscovery: React.FC = () => {
     'Legal',
     'Creative'
   ];
+
+  // Initialize search from URL parameters
+  useEffect(() => {
+    const urlSearchQuery = searchParams.get('search');
+    if (urlSearchQuery) {
+      setSearchQuery(urlSearchQuery);
+    }
+  }, [searchParams]);
+
+  // Auto-search when URL has search parameter
+  useEffect(() => {
+    if (searchQuery) {
+      handleSearch();
+    } else {
+      loadInitialData();
+    }
+  }, [searchQuery]);
 
   useEffect(() => {
     loadInitialData();

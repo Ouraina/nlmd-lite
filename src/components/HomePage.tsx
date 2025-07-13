@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Play, BookOpen, Leaf, Users, Sparkles, BarChart3, Shield, TestTube, Globe, Star } from 'lucide-react';
 
 const demoNotebooks = [
@@ -86,7 +87,24 @@ const collections = [
 ];
 
 const HomePage: React.FC = () => {
-  const [activeCollection, setActiveCollection] = React.useState('week');
+  const [activeCollection, setActiveCollection] = useState('week');
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  // Handle search functionality
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/discover?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/discover');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <div className="bg-gradient-to-b from-[#0a0f1c] to-[#181f2e] min-h-screen text-white">
@@ -112,9 +130,15 @@ const HomePage: React.FC = () => {
             <input
               type="text"
               placeholder="🔍 e.g. LLM, climate, curriculum, creative..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
               className="w-full md:w-96 px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-green-400"
             />
-            <button className="bg-green-400 text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-green-300 transition-colors">
+            <button 
+              onClick={handleSearch}
+              className="bg-green-400 text-black px-8 py-3 rounded-lg font-bold text-lg hover:bg-green-300 transition-colors"
+            >
               Discover
             </button>
           </div>

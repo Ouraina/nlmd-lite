@@ -3,11 +3,12 @@ import {
   BookOpen, Sparkles, Users, TrendingUp, Leaf, Star, Search, Filter, 
   Eye, Heart, Share2, Grid3X3, Table, BarChart3, Clock, Award, 
   Bookmark, Download, Settings, ChevronDown, SlidersHorizontal,
-  Zap, Globe, Atom, Brain, Target, Layers, Calendar, User, ExternalLink
+  Zap, Globe, Atom, Brain, Target, Layers, Calendar, User, ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { NotebookScraperService, NotebookMetadata } from '../services/notebookScraperService';
 
 interface FilterState {
@@ -50,6 +51,8 @@ const efficiencyRatings = ['A+', 'A', 'B', 'C', 'D'];
 export const UserDashboard: React.FC = () => {
   const { user } = useAuth();
   const { getSubscriptionPlan, isActive } = useSubscription(user?.id);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   // State management
   const [searchQuery, setSearchQuery] = useState('');
@@ -62,6 +65,9 @@ export const UserDashboard: React.FC = () => {
   const [savedSearches, setSavedSearches] = useState<string[]>([]);
   const [bookmarkedNotebooks, setBookmarkedNotebooks] = useState<string[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
+  const [dropZoneUrl, setDropZoneUrl] = useState('');
+  const [savingNotebook, setSavingNotebook] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   
   // Filter state
   const [filters, setFilters] = useState<FilterState>({
@@ -93,6 +99,23 @@ export const UserDashboard: React.FC = () => {
   useEffect(() => {
     applyFiltersAndSorting();
   }, [notebooks, searchQuery, filters, currentSort]);
+
+  // Initialize search from URL parameters
+  useEffect(() => {
+    const urlSearchQuery = searchParams.get('search');
+    if (urlSearchQuery) {
+      setSearchQuery(urlSearchQuery);
+    }
+  }, [searchParams]);
+
+  // Auto-search when URL has search parameter
+  useEffect(() => {
+    if (searchQuery) {
+      handleSearch();
+    } else {
+      loadInitialData();
+    }
+  }, [searchQuery]);
 
   const loadNotebooks = async () => {
     try {
@@ -387,6 +410,56 @@ export const UserDashboard: React.FC = () => {
     setSavedSearches(prev => [...prev, searchKey]);
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/discover?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate('/discover');
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const loadInitialData = () => {
+    applyFiltersAndSorting();
+  };
+
+  const handleSaveNotebook = async () => {
+    if (!isPremium) {
+      alert('Saving notebooks is a premium feature. Please upgrade to access this feature.');
+      return;
+    }
+
+    if (!user?.id) {
+      alert('Please log in to save notebooks.');
+      return;
+    }
+
+    if (!dropZoneUrl.trim()) {
+      setSaveMessage({ text: 'Please enter a valid URL.', type: 'error' });
+      return;
+    }
+
+    setSavingNotebook(true);
+    setSaveMessage(null);
+
+    try {
+      const saved = await NotebookScraperService.saveNotebook(user.id, dropZoneUrl);
+      setSaveMessage({ text: `Notebook "${saved.title}" saved!`, type: 'success' });
+      setDropZoneUrl('');
+      loadNotebooks(); // Refresh notebooks to include the new one
+    } catch (error) {
+      console.error('Error saving notebook:', error);
+      setSaveMessage({ text: 'Failed to save notebook. URL might be invalid or already saved.', type: 'error' });
+    } finally {
+      setSavingNotebook(false);
+    }
+  };
+
   const getQualityBadgeColor = (score: number) => {
     if (score >= 0.9) return 'bg-green-100 text-green-800 border-green-200';
     if (score >= 0.8) return 'bg-blue-100 text-blue-800 border-blue-200';
@@ -439,6 +512,7 @@ export const UserDashboard: React.FC = () => {
                 placeholder="🔍 Search notebooks, authors, institutions, or topics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
                 className="w-full pl-10 pr-4 py-3 bg-slate-800 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-green-400 focus:border-transparent"
               />
             </div>
@@ -558,6 +632,52 @@ export const UserDashboard: React.FC = () => {
               >
                 Clear All
               </button>
+            </div>
+          </div>
+
+          {/* Notebook URL Drop Zone */}
+          <div className="max-w-7xl mx-auto px-6 mb-6">
+            <div className="bg-slate-800/50 border-2 border-dashed border-slate-600 rounded-xl p-8 text-center hover:border-green-400 transition-colors">
+              <h3 className="text-xl font-bold text-white mb-4">
+                💾 Save Your Favorite Notebooks
+              </h3>
+              <p className="text-slate-400 mb-6">
+                Paste any NotebookLM URL to add it to your personal collection
+              </p>
+              
+              <div className="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto">
+                <input
+                  type="url"
+                  placeholder="https://notebooklm.google.com/notebook/..."
+                  value={dropZoneUrl}
+                  onChange={(e) => setDropZoneUrl(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSaveNotebook()}
+                  className="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                />
+                <button
+                  onClick={handleSaveNotebook}
+                  disabled={!dropZoneUrl.trim() || savingNotebook}
+                  className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                >
+                  {savingNotebook ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <BookOpen className="w-4 h-4" />
+                      Save Notebook
+                    </>
+                  )}
+                </button>
+              </div>
+              
+              {saveMessage && (
+                <div className={`mt-4 p-3 rounded-lg ${saveMessage.type === 'success' ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+                  {saveMessage.text}
+                </div>
+              )}
             </div>
           </div>
 

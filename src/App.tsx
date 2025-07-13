@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { LoginPage } from './components/auth/LoginPage';
-import { SignupPage } from './components/auth/SignupPage';
+import { Signup } from './components/auth/Signup';
 import { ResetPasswordPage } from './components/auth/ResetPasswordPage';
 import { UserDashboard } from './components/UserDashboard';
 import { ScrapingDashboard } from './components/ScrapingDashboard';
@@ -28,7 +28,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/success" element={<SuccessPage />} />
