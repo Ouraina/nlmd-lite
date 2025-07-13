@@ -38,6 +38,7 @@ export const SuccessPage: React.FC = () => {
     );
   }
 
+  // If sessionId is present, always show success (even if plan is missing)
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 w-full max-w-lg text-center">
@@ -47,8 +48,9 @@ export const SuccessPage: React.FC = () => {
             Payment Successful!
           </h1>
           <p className="text-slate-600 leading-relaxed mb-4">
-            Welcome to <strong className="text-green-600">{selectedPlan?.name || 'Premium Plan'}</strong>! 
-            Your subscription is now active and ready to use.
+            Welcome{selectedPlan?.name ? ` to ` : ''}
+            <strong className="text-green-600">{selectedPlan?.name || 'NotebookLM Directory Premium'}</strong>!
+            <br />Your subscription is now active and ready to use.
           </p>
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
             <p className="text-green-800 font-semibold">

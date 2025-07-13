@@ -21,6 +21,13 @@ export const createCheckoutSession = async (
     throw new Error('User not authenticated');
   }
 
+  console.log('🔄 Creating checkout session with:', {
+    priceId: request.priceId,
+    mode: request.mode,
+    successUrl: request.successUrl,
+    cancelUrl: request.cancelUrl
+  });
+
   // Use the real Supabase Edge Function with correct parameter names
   const { data, error } = await supabase.functions.invoke('stripe-checkout', {
     body: {
@@ -35,13 +42,22 @@ export const createCheckoutSession = async (
   });
 
   if (error) {
-    console.error('Stripe checkout error:', error);
+    console.error('❌ Stripe checkout error:', error);
+    console.error('📊 Full error details:', JSON.stringify(error, null, 2));
     throw new Error(`Payment processing failed: ${error.message}`);
   }
 
+  console.log('📥 Edge Function response:', data);
+
   if (!data?.url) {
+    console.error('🔍 No checkout URL in response:', data);
     throw new Error('No checkout URL returned from payment processor');
   }
+
+  console.log('✅ Checkout session created successfully:', {
+    sessionId: data.sessionId,
+    url: data.url
+  });
 
   return {
     sessionId: data.sessionId || 'unknown',
