@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle, ArrowRight, Star, Mail, Clock } from 'lucide-react';
-import { getProductByPriceId } from '../../stripe-config';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 
 export const SuccessPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  
-  const sessionId = searchParams.get('session_id');
-  const planId = searchParams.get('plan');
-  const selectedPlan = planId ? getProductByPriceId(planId) : null;
 
-  useEffect(() => {
-    // Clear any checkout-related data from localStorage if needed
-    localStorage.removeItem('checkout-session-id');
-  }, []);
+  // Accept any of the possible Stripe session param names
+  const sessionId =
+    searchParams.get('session_id') ||
+    searchParams.get('checkout_session_id') ||
+    searchParams.get('sessionId');
 
-  // Security check: Block access without valid Stripe session
+  // Log all params for debugging
+  React.useEffect(() => {
+    console.log('SuccessPage query params:', Object.fromEntries(searchParams.entries()));
+  }, [searchParams]);
+
   if (!sessionId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-6">
@@ -38,7 +38,7 @@ export const SuccessPage: React.FC = () => {
     );
   }
 
-  // If sessionId is present, always show success (even if plan is missing)
+  // Always show success if any session param is present
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8 w-full max-w-lg text-center">
@@ -48,8 +48,7 @@ export const SuccessPage: React.FC = () => {
             Payment Successful!
           </h1>
           <p className="text-slate-600 leading-relaxed mb-4">
-            Welcome{selectedPlan?.name ? ` to ` : ''}
-            <strong className="text-green-600">{selectedPlan?.name || 'NotebookLM Directory Premium'}</strong>!
+            Welcome to <strong className="text-green-600">NotebookLM Directory Premium</strong>!
             <br />Your subscription is now active and ready to use.
           </p>
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
@@ -61,7 +60,6 @@ export const SuccessPage: React.FC = () => {
             </p>
           </div>
         </div>
-
         <div className="space-y-4">
           <Link
             to="/dashboard"
@@ -70,7 +68,6 @@ export const SuccessPage: React.FC = () => {
             Go to Dashboard
             <ArrowRight className="w-4 h-4" />
           </Link>
-          
           <Link
             to="/discover"
             className="w-full bg-slate-100 text-slate-700 py-3 px-6 rounded-xl hover:bg-slate-200 transition-colors"
